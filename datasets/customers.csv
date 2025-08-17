@@ -1,0 +1,11 @@
+customer_id,name,email,registration_date,city,country
+CUST001,Alice Smith,alice.smith@example.com,2023-01-05,New York,USA
+CUST002,Bob Johnson,bob.j@example.com,2023-01-10,Los Angeles,USA
+CUST003,Charlie Brown,charlie.b@example.com,2023-01-15,London,UK
+CUST004,Diana Prince,diana.p@example.com,2023-01-20,Paris,France
+CUST005,Eve Adams,eve.a@example.com,2023-01-25,Berlin,Germany
+CUST006,Frank White,frank.w@example.com,2023-02-01,Tokyo,Japan
+CUST007,Grace Kelly,grace.k@example.com,2023-02-05,Sydney,Australia
+CUST008,Henry King,henry.k@example.com,2023-02-10,Toronto,Canada
+CUST009,Ivy Green,ivy.g@example.com,2023-02-15,New York,USA
+CUST010,Jack Black,jack.b@example.com,2023-02-20,London,UK

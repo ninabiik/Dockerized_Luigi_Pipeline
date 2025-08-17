@@ -1,0 +1,11 @@
+product_id,product_name,category,price,weight
+PROD001,Laptop Pro X,Electronics,1200.00,1.80
+PROD002,Wireless Mouse,Electronics,25.00,0.10
+PROD003,Mechanical Keyboard,Electronics,80.00,0.90
+PROD004,T-Shirt Cotton Blend,Apparel,20.00,0.20
+PROD005,Jeans Slim Fit,Apparel,60.00,0.70
+PROD006,Running Shoes XYZ,Footwear,95.00,0.60
+PROD007,Smart Watch Series 5,Electronics,250.00,0.05
+PROD008,Coffee Maker Deluxe,Home & Kitchen,120.00,2.50
+PROD009,Novel: The Data Story,Books,15.00,0.40
+PROD010,Yoga Mat Eco-Friendly,Sports,35.00,1.50
