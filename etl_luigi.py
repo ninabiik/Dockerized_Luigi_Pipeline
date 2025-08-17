@@ -3,13 +3,13 @@ import re
 import json
 import luigi
 import pandas as pd
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
 
 # ---------- Helpers
 
-def make_engine(host: str, port: int, user: str, password: str, db_name: str | None) -> Engine:
+def make_engine(host: str, port: int, user: str, password: str, db_name: Optional[str]) -> Engine:
     # If db_name is None, connect to server-level (for CREATE DATABASE IF NOT EXISTS)
     url = f"mysql+pymysql://{user}:{password}@{host}:{port}/"
     if db_name:

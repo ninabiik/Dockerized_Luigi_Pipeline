@@ -1,39 +1,41 @@
-# MySQL base image
+# MySQL (Oracle Linux base)
 FROM mysql:8.0
 
-# --- System deps ---
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y \
-      python3 python3-pip supervisor && \
-    rm -rf /var/lib/apt/lists/*
+# ---- System deps (use microdnf on Oracle Linux) ----
+RUN microdnf install -y python3 python3-pip && microdnf clean all
 
-# --- Python deps ---
+# ---- Python deps (pip) ----
+# Install supervisor from pip to avoid OS package managers
+# ---- Python deps (pip) ----
 RUN pip3 install --no-cache-dir \
     luigi==3.4.0 \
     pandas==2.2.2 \
     SQLAlchemy==2.0.31 \
     pymysql==1.1.0 \
-    pyyaml==6.0.2
+    pyyaml==6.0.2 \
+    supervisor==4.2.5 \
+    pyarrow==16.1.0 \
+    cryptography==42.0.5 #added to fix error
 
-# --- App files ---
+# ---- App files ----
 WORKDIR /app
-# Copy your Luigi pipeline
 COPY etl_luigi.py /app/etl_luigi.py
-# Optional defaults (you can also pass params via CLI)
 COPY luigi.cfg /app/luigi.cfg
 
-# --- MySQL init: create DB on first startup ---
-# Anything in this dir runs once when the MySQL datadir is empty
+# MySQL init: create DB at first startup
 COPY init.sql /docker-entrypoint-initdb.d/init.sql
 
-# --- Supervisor config to run mysqld + luigid together ---
+# Supervisor config to run mysqld + luigid
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Expose MySQL and Luigi scheduler ports
+# Ensure log dirs exist for supervisor (optional but nice)
+RUN mkdir -p /var/log && touch /var/log/luigid_stdout.log /var/log/luigid_stderr.log \
+    /var/log/mysql_supervisor_stdout.log /var/log/mysql_supervisor_stderr.log \
+    /var/log/supervisord.log
+
 EXPOSE 3306 8082
 
-# Default env (override at runtime!)
-ENV MYSQL_ROOT_PASSWORD=db_password
+# Use an obviously-not-real default; override at runtime with -e
+ENV MYSQL_ROOT_PASSWORD=changeme
 
-# Start both processes
 CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
