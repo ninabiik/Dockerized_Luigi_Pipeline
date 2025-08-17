@@ -18,7 +18,7 @@ Sample CSV datasets are provided for **testing the pipeline only**:
 Do **not** commit your dataset folder (`/datasets`) into Git. It should remain local and is mounted into the container at runtime for testing and development. Production data sources should be configured separately.
 
 By default, datasets are expected under:  
-`/Users/nina/Downloads/datasets`
+`/Users/nina/Downloads/data-engineering-bootcamp-2-main/datasets`
 
 They will be mounted into the container at `/data`.
 
@@ -40,29 +40,27 @@ They will be mounted into the container at `/data`.
 ## 🐳 Docker Setup
 
 ### 1. Build the image
-```bash
+```
 docker build -t nina/luigi-mysql:latest .
-````
-
+```
 ### 2. Run the container
-
-```bash
+```
 docker run -d --name luigi-etl \
   -e MYSQL_ROOT_PASSWORD="your_strong_pw" \
-  -p 3306:3306 \
-  -p 8082:8082 \
-  -v /Users/nina/Downloads/datasets:/data \
+  -p 3306:3306 -p 8082:8082 \
+  -v /Users/nina/Downloads/data-engineering-bootcamp-2-main/datasets:/data \
   nina/luigi-mysql:latest
 ```
+- MySQL available at localhost:3306
+- Luigi Scheduler UI at http://localhost:8082
 
-* MySQL available at `localhost:3306`
-* Luigi Scheduler UI at [http://localhost:8082](http://localhost:8082)
+⚠️ Passwords with special characters like @ must be URL-encoded (e.g., Nin%40cut3) unless you’ve patched the code to URL-encode credentials.
 
 ### 3. Run the ETL job
-
-```bash
-docker exec -it luigi-etl bash -lc \
-'python3 -m luigi --module /app/etl_luigi LoadAll \
+```
+docker exec -it luigi-etl bash -lc '
+export PYTHONPATH=/app
+python3 -m luigi --module etl_luigi LoadAll \
   --local-scheduler \
   --ETLConfig-data-dir /data \
   --ETLConfig-db-host 127.0.0.1 \
@@ -71,25 +69,17 @@ docker exec -it luigi-etl bash -lc \
   --ETLConfig-db-password "$MYSQL_ROOT_PASSWORD" \
   --ETLConfig-db-name ecommerce \
   --ETLConfig-load-mode replace'
-```
+``` 
+📊 Outputs
+- MySQL DB: ecommerce
+- Tables: customers, order_items, orders, payments, products
+- Audit Logs: Column normalization logs written to .luigi_work/*.log
+- Intermediate Data: Parquet files stored under .luigi_work/
 
----
+🛠 Configuration
+Defaults are stored in luigi.cfg:
 
-## 📊 Outputs
-
-* **MySQL DB**: `ecommerce`
-* **Tables**: `customers`, `order_items`, `orders`, `payments`, `products`
-* **Audit Logs**: Column normalization logs written to `.luigi_work/*.log`
-* **Intermediate Data**: Parquet files stored under `.luigi_work/`
-
----
-
-## 🛠 Configuration
-
-Defaults are stored in `luigi.cfg`:
-
-```ini
-[ETLConfig]
+```[ETLConfig]
 data_dir=/data
 db_host=127.0.0.1
 db_port=3306
@@ -98,34 +88,38 @@ db_password=changeme
 db_name=ecommerce
 load_mode=replace
 ```
-
 Override at runtime using Luigi CLI flags.
 
----
+✅ Features
+- Single Docker image (MySQL + Luigi + ETL)
+- Automatic DB creation (init.sql)
+- Column normalization & duplicate checking
+- Extensible: add new datasets or schema checks easily
+- Includes pyarrow (for Parquet) and cryptography (for MySQL 8 auth)
 
-## ✅ Features
+🚫 What Not to Commit
+- .idea/ (PyCharm/IntelliJ configs)
+- .luigi_work/ (Luigi intermediate files)
+- __pycache__/, .venv/ (Python cache/envs)
+- datasets/ folder (used only for local testing)
 
-* Single Docker image (MySQL + Luigi + ETL)
-* Automatic DB creation (`init.sql`)
-* Column normalization & duplicate checking
-* Extensible: add new datasets or schema checks easily
+All of these are covered in the included `.gitignore.`
 
----
+🔍 How to Inspect MySQL
+CLI inside container
+`docker exec -it luigi-etl mysql -uroot -p`
+From host
+`mysql -h 127.0.0.1 -P 3306 -uroot -p`
+Then:
+```
+SHOW DATABASES;
+USE ecommerce;
+SHOW TABLES;
+SELECT COUNT(*) FROM customers;
+```
+Or connect with a GUI (MySQL Workbench, DBeaver, TablePlus).
 
-## 🚫 What Not to Commit
-
-* `.idea/` (PyCharm/IntelliJ configs)
-* `.luigi_work/` (Luigi intermediate files)
-* `__pycache__/`, `.venv/` (Python cache/envs)
-* `datasets/` folder (used only for local testing)
-
-All of these are covered in the included `.gitignore`.
-
----
-
-## 🚀 Next Steps
-
-* Add schema validation rules per table
-* Define primary keys & indexes after load
-* Automate ETL run on container startup (via Supervisor)
-
+🚀 Next Steps
+- Add schema validation rules per table
+- Define primary keys & indexes after load
+- Automate ETL run on container startup (via Supervisor healthcheck)
