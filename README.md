@@ -51,7 +51,7 @@ docker run -d --name luigi-etl \
   -e MYSQL_ROOT_PASSWORD="your_strong_pw" \
   -p 3306:3306 \
   -p 8082:8082 \
-  -v /Users/nina/Downloads/data-engineering-bootcamp-2-main/datasets:/data \
+  -v /Users/nina/Downloads/datasets:/data \
   nina/luigi-mysql:latest
 ```
 
