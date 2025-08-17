@@ -17,7 +17,7 @@ RUN pip3 install --no-cache-dir \
 
 # --- App files ---
 WORKDIR /app
-# Copy your Luigi pipeline (use the one I gave you earlier)
+# Copy your Luigi pipeline
 COPY etl_luigi.py /app/etl_luigi.py
 # Optional defaults (you can also pass params via CLI)
 COPY luigi.cfg /app/luigi.cfg
@@ -33,7 +33,7 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 EXPOSE 3306 8082
 
 # Default env (override at runtime!)
-ENV MYSQL_ROOT_PASSWORD=changeme
+ENV MYSQL_ROOT_PASSWORD=db_password
 
 # Start both processes
 CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
