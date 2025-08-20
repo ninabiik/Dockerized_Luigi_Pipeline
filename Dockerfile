@@ -15,10 +15,19 @@ RUN pip3 install --no-cache-dir \
     pyarrow==16.1.0 \
     cryptography==42.0.5
 
+# add ML libs
+RUN pip3 install --no-cache-dir \
+    scikit-learn==1.5.1 \
+    statsmodels==0.14.2 \
+    numpy==1.26.4 \
+    scipy==1.12.0
+
+
 # ---- App files ----
 WORKDIR /app
 COPY etl_luigi.py /app/etl_luigi.py
-COPY luigi.cfg /app/luigi.cfg
+COPY ml_tasks.py   /app/ml_tasks.py
+COPY luigi.cfg     /app/luigi.cfg
 
 # ---- MySQL init script ----
 COPY init.sql /docker-entrypoint-initdb.d/init.sql
